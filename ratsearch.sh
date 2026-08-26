@@ -36,9 +36,6 @@ read_article() { #$1 = title query
 # ---- Conversation ----
 die() { kill "$$"; exit 1; } #stop the script
 loop() {
-    PING="$(curl -sS http://"$ENDPOINT"/v1/models)" || die #report curl errors
-    echo "$PING" | grep "error" >/dev/null && echo "Endpoint error:" && jq -n --argjson error "$PING" '$error' && die #report http errors
-    printf "%s\n%s\n%s\n%s\r" "ratsearch <-3,,~~" "$DATABASE" "$(jq -nr --argjson ping "$PING" '$ping.models[0].name')" "----------------------"
     turn="user"; while :; do #main conversation loop
         test "$turn" = "user" && listen && turn="assistant" #record user message    
         printf "\n%s\n" "  ===== AGENT =====" #agent banner
@@ -95,6 +92,9 @@ ratspin() { while :; do #spinner animation + generation status reporting
     done #^twoliner spinner animation, ish. relies on the \r above. also, sleep 0.1 is not posix :^V
 }
 
-#oops I gained some space after the refactor
+# ---- Init ----
+PING="$(curl -sS http://"$ENDPOINT"/v1/models)" || die #report curl errors
+echo "$PING" | grep "error" >/dev/null && echo "Endpoint error:" && jq -n --argjson error "$PING" '$error' && die #report http errors
+printf "%s\n%s\n%s\n%s\r" "ratsearch <-3,,~~" "$DATABASE" "$(jq -nr --argjson ping "$PING" '$ping.models[0].name')" "----------------------"
 
 loop #go!
