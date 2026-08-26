@@ -12,7 +12,15 @@ You are a helpful assistant.
 
 You can read Wikipedia articles; use this when factual info is directly requested. Use the `read_article` tool with an article title to read it.
 '
-# ---- Tools ----
+# ---- Tools ---- 
+#I like making my code tidy with manual ---- Section Headers ---- , thank you very much.
+conversation="$( #initialize conversation + tool definition
+    jq -n --arg system "$SYSTEM" '{
+        "messages":[{"role": "system", "content": $system}], 
+        "tools":[{"type": "function","function": {"name": "read_article","description": "read a wikipedia article","parameters": 
+        {"properties": {"title": {"type": "string","description": "article title"}},"required": ["title"]}}}],
+        "tool_choice": "auto"}'
+)"
 read_article() { #$1 = title query
     title="$(echo "$1" | tr ' ' '_')"
     details="$(zimdump list --details --url "$title" "$DATABASE" 2>&1)"
@@ -87,14 +95,6 @@ ratspin() { while :; do #spinner animation + generation status reporting
 }
 die() { kill "$$"; exit 1; } #stop the script
 
-# ---- Init ----. I like making my code tidy with handwritten ---- Section Headers ---- , thank you very much.
-conversation="$(
-    jq -n --arg system "$SYSTEM" '{
-        "messages":[{"role": "system", "content": $system}], 
-        "tools":[{"type": "function","function": {"name": "read_article","description": "read a wikipedia article","parameters": 
-        {"properties": {"title": {"type": "string","description": "article title"}},"required": ["title"]}}}],
-        "tool_choice": "auto"}'
-)"
-#printf "%s" "$conversation" | jq #view the conversation JSON structure
+#oops I gained some space after the refactor
 
 loop #go!
