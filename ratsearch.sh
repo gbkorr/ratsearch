@@ -34,6 +34,7 @@ read_article() { #$1 = title query
 } #remember, if your tool outputs a well-made error the model can adapt and correct itself
 
 # ---- Conversation ----
+die() { kill "$$"; exit 1; } #stop the script
 loop() {
     PING="$(curl -sS http://"$ENDPOINT"/v1/models)" || die #report curl errors
     echo "$PING" | grep "error" >/dev/null && echo "Endpoint error:" && jq -n --argjson error "$PING" '$error' && die #report http errors
@@ -93,7 +94,6 @@ ratspin() { while :; do #spinner animation + generation status reporting
         for i in $(echo "1 2 3 4 5 6"); do printf "%s\b\b\b\b\b\b\033[P" "$rat"; sleep 0.1; done
     done #^twoliner spinner animation, ish. relies on the \r above. also, sleep 0.1 is not posix :^V
 }
-die() { kill "$$"; exit 1; } #stop the script
 
 #oops I gained some space after the refactor
 
