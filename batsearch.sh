@@ -7,9 +7,9 @@ conv="$(jq -n --arg system "$SYSTEM" --arg prompt "$1" '{
     "tools":[{"type": "function","function": {"name": "websearch","description": "search the web","parameters": 
         {"properties": {"search query": {"type": "string","description": "keywords or url"}},"required": ["search query"]}}}],
     "tool_choice": "auto"}')"
-websearch() { #url = has period and no spaces; otherwise it's search keywords
-    url="$1"; test -z "$(echo "$url" | grep -v " " | grep "\.")" && url="duckduckgo.com/$(echo "$1" | tr ' ' '+')"
-    w3m -dump -no-cookie "$url" | head -c 65535
+websearch() { #if a url is in the keywords, access it directly. Qwen likes to prepend "site:", so we have to remove that
+    url="$(echo "$1" | grep -oE '[^ ]*\.[^ ]*' | head -1 | sed 's/site://g')"; test -z "$url" && url="duckduckgo.com/$(echo "$1" | tr ' ' '+')"
+    w3m -dump -no-cookie -o accept_encoding=identity "$url" | head -c 65535
 }
 loop() { while :; do parse "$(query)"; sleep 1; done; }
 query() { printf "%s" "$conv" \
