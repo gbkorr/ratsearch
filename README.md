@@ -8,6 +8,8 @@ CLI tool for oneshot prompts; outputs LLM response to stdout. Lets model perform
 Requires: `curl jq w3m`  
 Usage: `sh batsearch.sh [--verbose] PROMPT [ENDPOINT]`
 
+--verbose logs reasoning and websearches to stderr. Default endpoint = "localhost:8080" for llama-server
+
 ### Ratsearch <-3,,~~
 Interactive chat, lets model search and read articles from an offline Wikipedia archive.
 
@@ -18,6 +20,7 @@ Setup:
 - put `ratsearch.sh` and your wikipedia zim in a folder
 - rename your wikipedia zim to `wikipedia.zim`
 - run `zimdump list wikipedia.zim > index` to generate the list of titles
+
 Usage: `sh ratsearch.sh`
 
 Ratsearch may be receiving an update soon :)
