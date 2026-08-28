@@ -1,16 +1,16 @@
 #!/bin/sh
 verbose="$(test -n "$(echo "$@" | grep "\-\-verbose")" && echo true)" && shift
 ENDPOINT="${2:-localhost:8080}"
-SYSTEM="$(echo "You are a helpful assistant.\n\nToday's date: $(date)\n\n## Skills\n\nYou can access the web with the websearch tool.")"
+SYSTEM="$(echo "You are a helpful assistant.\n\nToday's date: $(date)\n\n## Skills\n\nYou can access the web and visit pages with the websearch tool.")"
 conv="$(jq -n --arg system "$SYSTEM" --arg prompt "$1" '{
-    "messages":[{"role": "system", "content": $system},{"role": "user", "content": $prompt}], 
-    "tools":[{"type": "function","function": {"name": "websearch","description": "search the web","parameters": 
-        {"properties": {"search query": {"type": "string","description": "keywords or url"}},"required": ["search query"]}}}],
+    "messages":[{"role": "system", "content": $system},{"role": "user", "content": $prompt}],
+    "tools":[{"type": "function","function": {"name": "websearch","description": "search the web or read a page","parameters": 
+        {"properties":{"search query": {"type": "string","description": "keywords"}}}}}],
     "tool_choice": "auto"}')"
-websearch() { #if a url is in the keywords, access it directly. Qwen likes to prepend "site:", so we have to remove that
+websearch() {
     url="$(echo "$1" | grep -oE '[^ ]*\.[^ ]*' | head -1 | sed 's/site://g')"; test -z "$url" && url="duckduckgo.com/$(echo "$1" | tr ' ' '+')"
     w3m -dump -no-cookie -o accept_encoding=identity "$url" | head -c 65535
-}
+} #if a url is in the keywords, access it directly. Qwen likes to prepend "site:", so we have to remove that
 loop() { while :; do parse "$(query)"; sleep 1; done; }
 query() { printf "%s" "$conv" \
     | curl -sS --request POST --url http://"$ENDPOINT"/v1/chat/completions --header "Content-Type: application/json" --data @- \
