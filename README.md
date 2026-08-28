@@ -8,7 +8,7 @@ CLI tool for oneshot prompts; outputs LLM response to stdout. Lets model perform
 Requires: `curl jq w3m`  
 Usage: `sh batsearch.sh [--verbose] PROMPT [ENDPOINT]`
 
---verbose logs reasoning and websearches to stderr. Default endpoint = "localhost:8080" for llama-server
+--verbose logs reasoning and search queries to stderr. Default endpoint = "localhost:8080" for llama-server
 
 ### Ratsearch <-3,,~~
 Interactive chat, lets model search and read articles from an offline Wikipedia archive.
